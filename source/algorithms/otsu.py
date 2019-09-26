@@ -5,6 +5,7 @@ __email__ = 'samir.adrik@gmail.com'
 
 import matplotlib.pyplot as plt
 from skimage import io
+from skimage.filters import threshold_otsu
 import numpy as np
 
 
@@ -56,25 +57,6 @@ class Otsu:
         """
         self.image = image
         self.shape = np.shape(self.image)
-        self.thresh = self.otsu_threshold(self.image)
-
-    def binarization(self):
-        """
-        Threshold function
-
-        Returns
-        -------
-        Out         : np.ndarray()
-                      Binarized image, i.e. all pixel values are either 0 or 255
-
-        """
-        m, n, *_ = self.shape
-        binarised = np.zeros([m, n], dtype=np.uint8)
-        image = self.mean_image(self.image)
-
-        binarised[image < self.thresh] = 0
-        binarised[image >= self.thresh] = 255
-        return binarised
 
     def histogram(self, image):
         """
@@ -128,6 +110,26 @@ class Otsu:
                 maximum = var
                 th = i
         return th
+
+    def binarization(self):
+        """
+        Threshold function
+
+        Returns
+        -------
+        Out         : np.ndarray()
+                      Binarized image, i.e. all pixel values are either 0 or 255
+
+        """
+        m, n, *_ = self.shape
+        binarised = np.zeros([m, n], dtype=np.uint8)
+
+        image = self.mean_image(self.image)
+        tresh = self.otsu_threshold(self.image)
+
+        binarised[image < tresh] = 0
+        binarised[image >= tresh] = 255
+        return binarised
 
     def compare_images(self):
         """
