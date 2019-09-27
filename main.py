@@ -6,6 +6,6 @@ __email__ = 'samir.adrik@gmail.com'
 from source.algorithms.otsu import Otsu
 from skimage import io
 
-bee_image = io.imread('source/images/lenna.png')
-otsu_image = Otsu(bee_image)
+bees = io.imread('source/images/bees.jpg')
+otsu_image = Otsu(bees)
 otsu_image.compare_images()

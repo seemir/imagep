@@ -5,34 +5,27 @@ __email__ = 'samir.adrik@gmail.com'
 
 import matplotlib.pyplot as plt
 from skimage import io
-from skimage.filters import threshold_otsu
 import numpy as np
 
 
 class Otsu:
 
     @staticmethod
-    def mean_image(image, axis=2):
+    def mean_image(image: np.ndarray, axis: int = 2):
         """
         Returns the average of the array elements along given axis.
 
         Parameters
         ----------
-        image       : np.ndarray
-                      image to apply mean function
-        axis         : numeric
-                      Axis or axes along which the means are computed.
+        image        : np.ndarray
+                       image to apply mean function
+        axis         : int
+                       Axis or axes along which the means are computed.
 
         Returns
         -------
         Out         : np.ndarray()
                       image with average elements. ValueError if image is not 2D
-
-        Notes
-        -------
-        ..[1] M. Sezgin & B. Sankur (2004). "Survey over image thresholding techniques and
-          quantitative performance evaluation". Journal of Electronic Imaging. 13 (1): 146–165.
-          doi:10.1117/1.1631315
 
         """
         dim = len(image.shape)
@@ -45,7 +38,7 @@ class Otsu:
 
     def __init__(self, image: np.ndarray):
         """
-        Binarize an image using Otsu's method to find optimal threshold value. The returned image
+        Binarize an image using Otsu's method[1] to find optimal threshold value. The returned image
         will be in the form of an 8-bit (2^3) integer array with 255 as white and 0 as black.
 
         Parameters
@@ -54,11 +47,16 @@ class Otsu:
                       Image to apply binarization on. If color image the last dimension
                       is considered color value, i.e. as RGB values.
 
+        Notes
+        -------
+        ..[1] Nobuyuki Otsu (1979). "A threshold selection method from gray-level histograms".
+              IEEE Trans. Sys. Man. Cyber. 9 (1): 62–66. doi:10.1109/TSMC.1979.4310076.
+
         """
         self.image = image
         self.shape = np.shape(self.image)
 
-    def histogram(self, image):
+    def histogram(self, image: np.ndarray):
         """
         Method for producing Image histogram with 256 bins
 
@@ -77,7 +75,7 @@ class Otsu:
                 histogram[pixel_value] += 1
         return histogram
 
-    def otsu_threshold(self, image):
+    def otsu_threshold(self, image: np.ndarray):
         """
         Finds the optimal threshold value of given image using Otsu's method
 
@@ -135,11 +133,8 @@ class Otsu:
         """
         Compares side-by-side the original and binarized images
 
-        Returns
-        -------
-
         """
-        plt.figure(figsize=(10, 10))
+        plt.figure()
         plt.subplot(1, 2, 1)
         io.imshow(self.image)
         plt.xticks([]), plt.yticks([])
