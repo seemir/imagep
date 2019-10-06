@@ -10,7 +10,7 @@ import numpy as np
 
 class Otsu:
 
-    def __init__(self, image: np.ndarray):
+    def __init__(self, image: np.ndarray, bins=256):
         """
         Binarize an image using Otsu's method[1] to find optimal threshold value. The returned image
         will be in the form of an 8-bit (2^3) integer array with 255 as white and 0 as black.
@@ -33,6 +33,7 @@ class Otsu:
             self.image = np.dot(image, [0.2989, 0.5870, 0.1140])
         else:
             self.image = image
+        self.bins = bins
 
     def histogram(self):
         """
@@ -47,7 +48,7 @@ class Otsu:
         # Scratch-Implementation
         # -------------------------------------------------------
         # m, n, *_ = self.image.shape
-        # hist = np.zeros(256)
+        # hist = np.zeros(self.bins)
         # image = self.image.mean(axis=2)
         # for i in range(0, m):
         #     for j in range(0, n):
@@ -57,7 +58,7 @@ class Otsu:
 
         # Numpy-Implementation
         # -------------------------------------------------------
-        return np.histogram(self.image.ravel(), bins=256)
+        return np.histogram(self.image.ravel(), bins=self.bins)
 
     def otsu_threshold(self):
         """
@@ -114,14 +115,13 @@ class Otsu:
 
         """
         binary = self.image <= self.otsu_threshold()
-        return binary.__invert__() * 255
+        return binary.__invert__() * (self.bins - 1)
 
     def compare_images(self):
         """
         Compares side-by-side the original and binarized images
 
         """
-
         plt.figure()
         for i, method in enumerate([self.image, self.binarization()]):
             plt.subplot(1, 2, i + 1)
