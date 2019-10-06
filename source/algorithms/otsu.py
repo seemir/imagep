@@ -76,9 +76,9 @@ class Otsu:
         # total = np.sum(hist)
         # var, maximum, th = 0, 0, 0
         # sum_b, w_b = 0, 0
-        # sum_t = np.dot(np.array(range(0, 256)), hist)
+        # sum_t = np.dot(np.array(range(0, self.bins)), hist)
         #
-        # for i in range(0, 256):
+        # for i in range(0, self.bins):
         #     w_b += hist[i]
         #     w_f = total - w_b
         #     if w_b == 0 or w_f == 0:
@@ -122,9 +122,30 @@ class Otsu:
         Compares side-by-side the original and binarized images
 
         """
+        gridsize = (2, 2)
         plt.figure()
-        for i, method in enumerate([self.image, self.binarization()]):
-            plt.subplot(1, 2, i + 1)
-            plt.imshow(method)
-            plt.yticks([]), plt.xticks([])
+
+        ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=1, rowspan=1)
+        ax2 = plt.subplot2grid(gridsize, (0, 1), colspan=1, rowspan=1)
+        ax3 = plt.subplot2grid(gridsize, (1, 0))
+        ax4 = plt.subplot2grid(gridsize, (1, 1))
+
+        ax1.hist(self.image.ravel(), bins=self.bins, color='b', log=True)
+        ax1.axvline(self.otsu_threshold(), color='r')
+        ax1.set_title("Otsu Threshold: " + str(self.otsu_threshold()))
+        ax1.grid()
+
+        ax2.imshow(self.image)
+        ax2.set_xticks([])
+        ax2.set_yticks([])
+
+        ax3.hist(self.image.ravel(), bins=self.bins, color='b')
+        ax3.axvline(self.otsu_threshold(), color='r')
+        ax3.grid()
+
+        ax4.imshow(self.binarization())
+        ax4.set_xticks([])
+        ax4.set_yticks([])
+
+        plt.tight_layout()
         plt.show()
