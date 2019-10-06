@@ -4,8 +4,8 @@ __author__ = 'Samir Adrik'
 __email__ = 'samir.adrik@gmail.com'
 
 from source.algorithms.otsu import Otsu
-from skimage import io
+from matplotlib.image import imread
 
-bees = io.imread('source/images/bees.jpg')
-otsu_image = Otsu(bees)
+image = imread('source/images/bees.jpg')
+otsu_image = Otsu(image)
 otsu_image.compare_images()

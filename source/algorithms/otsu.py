@@ -4,37 +4,11 @@ __author__ = 'Samir Adrik'
 __email__ = 'samir.adrik@gmail.com'
 
 import matplotlib.pyplot as plt
-from skimage import io
+from warnings import warn
 import numpy as np
 
 
 class Otsu:
-
-    @staticmethod
-    def mean_image(image: np.ndarray, axis: int = 2):
-        """
-        Returns the average of the array elements along given axis.
-
-        Parameters
-        ----------
-        image        : np.ndarray
-                       image to apply mean function
-        axis         : int
-                       Axis or axes along which the means are computed.
-
-        Returns
-        -------
-        Out         : np.ndarray()
-                      image with average elements. ValueError if image is not 2D
-
-        """
-        dim = len(image.shape)
-
-        if dim == 3:
-            image = image.mean(axis)
-        else:
-            raise ValueError('image must be a 2D image, got {} dimensions'.format(dim))
-        return image
 
     def __init__(self, image: np.ndarray):
         """
@@ -53,10 +27,14 @@ class Otsu:
               IEEE Trans. Sys. Man. Cyber. 9 (1): 62–66. doi:10.1109/TSMC.1979.4310076.
 
         """
-        self.image = image
-        self.shape = np.shape(self.image)
+        if len(image.shape) > 3 and image.shape[-1] in (3, 4):
+            warn("otsu expects grayscale images; image shape '{}' looks like an RGB image."
+                 " Continuing with gray-scaled version of input image".format(image.shape))
+            self.image = np.dot(image, [0.2989, 0.5870, 0.1140])
+        else:
+            self.image = image
 
-    def histogram(self, image: np.ndarray):
+    def histogram(self):
         """
         Method for producing Image histogram with 256 bins
 
@@ -66,23 +44,24 @@ class Otsu:
                       Image histogram with 256 bins
 
         """
-        m, n, *_ = self.shape
-        histogram = np.zeros(256)
-        image = self.mean_image(image)
-        for i in range(0, m):
-            for j in range(0, n):
-                pixel_value = int(image[i, j])
-                histogram[pixel_value] += 1
-        return histogram
+        # Scratch-Implementation
+        # -------------------------------------------------------
+        # m, n, *_ = self.image.shape
+        # hist = np.zeros(256)
+        # image = self.image.mean(axis=2)
+        # for i in range(0, m):
+        #     for j in range(0, n):
+        #         pixel_value = int(image[i, j])
+        #         hist[pixel_value] += 1
+        # return hist
 
-    def otsu_threshold(self, image: np.ndarray):
+        # Numpy-Implementation
+        # -------------------------------------------------------
+        return np.histogram(self.image.ravel(), bins=256)
+
+    def otsu_threshold(self):
         """
         Finds the optimal threshold value of given image using Otsu's method
-
-        Parameters
-        ----------
-        image       : np.ndarray
-                      Image to apply Otso's method
 
         Returns
         -------
@@ -90,23 +69,38 @@ class Otsu:
                       optimal threshold based on Otsu's method
 
         """
-        hist = self.histogram(image)
-        total = np.sum(hist)
-        var, maximum, th = 0, 0, 0
-        sum_b, w_b = 0, 0
-        sum_t = np.dot(np.array(range(0, 256)), hist)
+        # Scratch-Implementation
+        # -------------------------------------------------------
+        # hist = self.histogram()
+        # total = np.sum(hist)
+        # var, maximum, th = 0, 0, 0
+        # sum_b, w_b = 0, 0
+        # sum_t = np.dot(np.array(range(0, 256)), hist)
+        #
+        # for i in range(0, 256):
+        #     w_b += hist[i]
+        #     w_f = total - w_b
+        #     if w_b == 0 or w_f == 0:
+        #         continue
+        #     sum_b += i * hist[i]
+        #     sum_f = sum_t - sum_b
+        #     var = w_b * w_f * (sum_b / w_b - sum_f / w_f) ** 2
+        #     if var > maximum:
+        #         maximum = var
+        #         th = i
+        # return th
 
-        for i in range(0, 256):
-            w_b += hist[i]
-            w_f = total - w_b
-            if w_b == 0 or w_f == 0:
-                continue
-            sum_b += i * hist[i]
-            sum_f = sum_t - sum_b
-            var = w_b * w_f * (sum_b / w_b - sum_f / w_f) ** 2
-            if var > maximum:
-                maximum = var
-                th = i
+        # Numpy-Implementation
+        # -------------------------------------------------------
+        hist, center = self.histogram()
+        hist = hist.astype(float)
+        w_b = np.cumsum(hist)
+        w_f = np.cumsum(hist[::-1])[::-1]
+        sum_b = np.cumsum(hist * center[1:]) / w_b
+        sum_f = (np.cumsum((hist * center[1:])[::-1]) / w_f[::-1])[::-1]
+        var = w_b[:-1] * w_f[1:] * (sum_b[:-1] - sum_f[1:]) ** 2
+        i = np.argmax(var)
+        th = center[:-1][i]
         return th
 
     def binarization(self):
@@ -119,28 +113,18 @@ class Otsu:
                       Binarized image, i.e. all pixel values are either 0 or 255
 
         """
-        m, n, *_ = self.shape
-        binarised = np.zeros([m, n], dtype=np.uint8)
-
-        image = self.mean_image(self.image)
-        tresh = self.otsu_threshold(self.image)
-
-        binarised[image < tresh] = 0
-        binarised[image >= tresh] = 255
-        return binarised
+        binary = self.image <= self.otsu_threshold()
+        return binary.__invert__() * 255
 
     def compare_images(self):
         """
         Compares side-by-side the original and binarized images
 
         """
+
         plt.figure()
-        plt.subplot(1, 2, 1)
-        io.imshow(self.image)
-        plt.xticks([]), plt.yticks([])
-
-        plt.subplot(1, 2, 2)
-        io.imshow(self.binarization())
-        plt.xticks([]), plt.yticks([])
-
-        io.show()
+        for i, method in enumerate([self.image, self.binarization()]):
+            plt.subplot(1, 2, i + 1)
+            plt.imshow(method)
+            plt.yticks([]), plt.xticks([])
+        plt.show()
