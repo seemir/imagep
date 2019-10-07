@@ -4,6 +4,7 @@ __author__ = 'Samir Adrik'
 __email__ = 'samir.adrik@gmail.com'
 
 import matplotlib.pyplot as plt
+from skimage import color
 from warnings import warn
 import numpy as np
 
@@ -30,7 +31,7 @@ class Otsu:
         if len(image.shape) > 3 and image.shape[-1] in (3, 4):
             warn("otsu expects grayscale images; image shape '{}' looks like an RGB image."
                  " Continuing with gray-scaled version of input image".format(image.shape))
-            self.image = np.dot(image, [0.2989, 0.5870, 0.1140])
+            self.image = color.rgb2gray(image)
         else:
             self.image = image
         self.bins = bins
@@ -52,8 +53,7 @@ class Otsu:
         # image = self.image.mean(axis=2)
         # for i in range(0, m):
         #     for j in range(0, n):
-        #         pixel_value = int(image[i, j])
-        #         hist[pixel_value] += 1
+        #         hist[int(image[i, j])] += 1
         # return hist
 
         # Numpy-Implementation
@@ -106,7 +106,7 @@ class Otsu:
 
     def binarization(self):
         """
-        Threshold function
+        Binarization function
 
         Returns
         -------
