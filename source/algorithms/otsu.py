@@ -21,6 +21,8 @@ class Otsu:
         image       : np.ndarray
                       Image to apply binarization on. If color image the last dimension
                       is considered color value, i.e. as RGB values.
+        bins        : int
+                      number of bins for histogram
 
         Notes
         -------
@@ -135,7 +137,7 @@ class Otsu:
         ax1.set_title("Otsu Threshold: " + str(self.otsu_threshold()))
         ax1.grid()
 
-        ax2.imshow(self.image)
+        ax2.imshow(self.image, cmap="gray", vmin=0, vmax=255)
         ax2.set_xticks([])
         ax2.set_yticks([])
 
@@ -143,9 +145,8 @@ class Otsu:
         ax3.axvline(self.otsu_threshold(), color='r')
         ax3.grid()
 
-        ax4.imshow(self.binarization())
+        ax4.imshow(self.binarization(), cmap="gray", vmin=0, vmax=255)
         ax4.set_xticks([])
         ax4.set_yticks([])
 
-        plt.tight_layout()
         plt.show()

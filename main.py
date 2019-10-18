@@ -3,9 +3,13 @@
 __author__ = 'Samir Adrik'
 __email__ = 'samir.adrik@gmail.com'
 
-from source.algorithms.otsu import Otsu
-from matplotlib.image import imread
+from source.algorithms import Equalization
+from source.algorithms import Otsu
+import matplotlib.image as mpimg
 
-image = imread('source/images/bees.jpg')
+image = mpimg.imread('source/images/airfield.tif')
 otsu_image = Otsu(image)
 otsu_image.compare_images()
+
+equal_image = Equalization(image)
+equal_image.compare_images()
