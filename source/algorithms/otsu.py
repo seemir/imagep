@@ -124,29 +124,26 @@ class Otsu:
         Compares side-by-side the original and binarized images
 
         """
-        gridsize = (2, 2)
         plt.figure()
+        plt.subplot(2, 2, 1)
+        plt.hist(self.image.ravel(), bins=self.bins, color='b', log=True)
+        plt.axvline(self.otsu_threshold(), color='r')
+        plt.title("Otsu Threshold: " + str(self.otsu_threshold()))
+        plt.grid()
 
-        ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=1, rowspan=1)
-        ax2 = plt.subplot2grid(gridsize, (0, 1), colspan=1, rowspan=1)
-        ax3 = plt.subplot2grid(gridsize, (1, 0))
-        ax4 = plt.subplot2grid(gridsize, (1, 1))
+        plt.subplot(2, 2, 2)
+        plt.imshow(self.image, cmap="gray", vmin=0, vmax=255)
+        plt.xticks([])
+        plt.yticks([])
 
-        ax1.hist(self.image.ravel(), bins=self.bins, color='b', log=True)
-        ax1.axvline(self.otsu_threshold(), color='r')
-        ax1.set_title("Otsu Threshold: " + str(self.otsu_threshold()))
-        ax1.grid()
+        plt.subplot(2, 2, 3)
+        plt.hist(self.image.ravel(), bins=self.bins, color='b')
+        plt.axvline(self.otsu_threshold(), color='r')
+        plt.grid()
 
-        ax2.imshow(self.image, cmap="gray", vmin=0, vmax=255)
-        ax2.set_xticks([])
-        ax2.set_yticks([])
-
-        ax3.hist(self.image.ravel(), bins=self.bins, color='b')
-        ax3.axvline(self.otsu_threshold(), color='r')
-        ax3.grid()
-
-        ax4.imshow(self.binarization(), cmap="gray", vmin=0, vmax=255)
-        ax4.set_xticks([])
-        ax4.set_yticks([])
+        plt.subplot(2, 2, 4)
+        plt.imshow(self.binarization(), cmap="gray", vmin=0, vmax=255)
+        plt.xticks([])
+        plt.yticks([])
 
         plt.show()
