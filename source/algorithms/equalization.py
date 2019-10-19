@@ -4,7 +4,6 @@ __author__ = 'Samir Adrik'
 __email__ = 'samir.adrik@gmail.com'
 
 from .image_process import ImageProcess
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -36,12 +35,18 @@ class Equalization(ImageProcess):
                       Image histogram with 256 bins
 
         """
-        m, n, *_ = self.image.shape
-        hist = np.zeros(self.bins)
-        for i in range(m):
-            for j in range(n):
-                hist[int(self.image[i, j])] += 1
-        return hist
+        # Scratch implementation
+        # -------------------------------------------------------
+        # m, n, *_ = self.image.shape
+        # hist = np.zeros(self.bins)
+        # for i in range(m):
+        #     for j in range(n):
+        #         hist[int(self.image[i, j])] += 1
+        # return hist
+        #
+        # Numpy-Implementation
+        # -------------------------------------------------------
+        return np.histogram(self.image.ravel(), self.bins)
 
     def cum_hist(self):
         """
@@ -53,12 +58,18 @@ class Equalization(ImageProcess):
                       Image cumulative histogram with 256 bins
 
         """
-        cum_hist = np.zeros(self.bins)
-        hist = self.histogram()
-        cum_hist[0] = hist[0]
-        for i in range(self.bins - 1):
-            cum_hist[i + 1] = cum_hist[i] + hist[i + 1]
-        return cum_hist
+        # Scratch implementation
+        # # -------------------------------------------------------
+        # cum_hist = np.zeros(self.bins)
+        # hist = self.histogram()
+        # cum_hist[0] = hist[0]
+        # for i in range(self.bins - 1):
+        #     cum_hist[i + 1] = cum_hist[i] + hist[i + 1]
+        # return cum_hist
+        #
+        # Numpy-Implementation
+        # -------------------------------------------------------
+        return np.cumsum(self.histogram()[0])
 
     def equalization(self):
         """
@@ -73,7 +84,7 @@ class Equalization(ImageProcess):
         image = self.image.copy()
         cum_hist = self.cum_hist()
         m, n, *_ = image.shape
-        k = self.bins
+        k = self.bins - 1
         mm = m * n
         for i in range(m):
             for j in range(n):
@@ -87,24 +98,5 @@ class Equalization(ImageProcess):
         Compares side-by-side the original and equalized image
 
         """
-        plt.figure()
-        plt.subplot(2, 2, 1)
-        plt.hist(self.image.ravel(), bins=self.bins, color='b')
-        plt.title("Histogram Equalization")
-        plt.grid()
-
-        plt.subplot(2, 2, 2)
-        plt.imshow(self.image, cmap="gray", vmin=0, vmax=255)
-        plt.xticks([])
-        plt.yticks([])
-
-        plt.subplot(2, 2, 3)
-        plt.hist(self.equalization().ravel(), bins=self.bins, color='b')
-        plt.grid()
-
-        plt.subplot(2, 2, 4)
-        plt.imshow(self.equalization(), cmap="gray", vmin=0, vmax=255)
-        plt.xticks([])
-        plt.yticks([])
-
-        plt.show()
+        self._compare_images(self.image.ravel(), self.image, self.equalization().ravel(),
+                             self.equalization(), title="Histogram Equalization", bins=self.bins)

@@ -4,8 +4,9 @@ __author__ = 'Samir Adrik'
 __email__ = 'samir.adrik@gmail.com'
 
 from abc import ABC, abstractmethod
-from skimage import color
+import matplotlib.pyplot as plt
 from warnings import warn
+from skimage import color
 import numpy as np
 
 
@@ -37,3 +38,53 @@ class ImageProcess(ABC):
         else:
             self.image = image if condition else image.mean(axis=2)
         self.bins = bins
+
+    @staticmethod
+    def _compare_images(top_hist, top_pic, bottom_hist, bottom_pic, title, log=False, bins=256,
+                        x_line=None):
+        """
+        Compares side-by-side the original and equalized image
+
+        Parameters
+        ----------
+        top_hist        : np.ndarray
+                          first (top left) histogram to plot
+        top_pic         : np.ndarray
+                          top right image to display
+        bottom_hist     : np.ndarray
+                          second (bottom left) histogram to add to plot
+        log             : bool
+                          logarithmic scale on bottom left histogram
+        bottom_pic      : np.ndarray
+                          bottom right processed image
+        title           : str
+                          title to be displayed
+        bins            : int
+                          number of bins
+        x_line            : int
+                          vertical line through plot at x position
+
+        """
+        plt.figure()
+        plt.subplot(2, 2, 1)
+        plt.hist(top_hist, bins, color='b')
+        plt.axvline(x_line, color='r') if x_line else None
+        plt.title(title)
+        plt.grid()
+
+        plt.subplot(2, 2, 2)
+        plt.imshow(top_pic, cmap="gray", vmin=0, vmax=255)
+        plt.xticks([])
+        plt.yticks([])
+
+        plt.subplot(2, 2, 3)
+        plt.hist(bottom_hist, bins, color='b', log=log)
+        plt.axvline(x_line, color='r') if x_line else None
+        plt.grid()
+
+        plt.subplot(2, 2, 4)
+        plt.imshow(bottom_pic, cmap="gray", vmin=0, vmax=255)
+        plt.xticks([])
+        plt.yticks([])
+
+        plt.show()

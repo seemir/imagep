@@ -4,7 +4,6 @@ __author__ = 'Samir Adrik'
 __email__ = 'samir.adrik@gmail.com'
 
 from .image_process import ImageProcess
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -45,12 +44,11 @@ class Otsu(ImageProcess):
         # -------------------------------------------------------
         # m, n, *_ = self.image.shape
         # hist = np.zeros(self.bins)
-        # image = self.image.mean(axis=2)
         # for i in range(0, m):
         #     for j in range(0, n):
         #         hist[int(image[i, j])] += 1
         # return hist
-
+        #
         # Numpy-Implementation
         # -------------------------------------------------------
         return np.histogram(self.image.ravel(), bins=self.bins)
@@ -117,26 +115,6 @@ class Otsu(ImageProcess):
         Compares side-by-side the original and binarized images
 
         """
-        plt.figure()
-        plt.subplot(2, 2, 1)
-        plt.hist(self.image.ravel(), bins=self.bins, color='b', log=True)
-        plt.axvline(self.otsu_threshold(), color='r')
-        plt.title("Otsu Threshold: " + str(self.otsu_threshold()))
-        plt.grid()
-
-        plt.subplot(2, 2, 2)
-        plt.imshow(self.image, cmap="gray", vmin=0, vmax=255)
-        plt.xticks([])
-        plt.yticks([])
-
-        plt.subplot(2, 2, 3)
-        plt.hist(self.image.ravel(), bins=self.bins, color='b')
-        plt.axvline(self.otsu_threshold(), color='r')
-        plt.grid()
-
-        plt.subplot(2, 2, 4)
-        plt.imshow(self.binarization(), cmap="gray", vmin=0, vmax=255)
-        plt.xticks([])
-        plt.yticks([])
-
-        plt.show()
+        self._compare_images(self.image.ravel(), self.image, self.image.ravel(),
+                             self.binarization(), "Otsu Threshold: " + str(self.otsu_threshold()),
+                             log=True, bins=self.bins, x_line=self.otsu_threshold())
