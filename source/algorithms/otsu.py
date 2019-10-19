@@ -3,13 +3,12 @@
 __author__ = 'Samir Adrik'
 __email__ = 'samir.adrik@gmail.com'
 
+from .image_process import ImageProcess
 import matplotlib.pyplot as plt
-from skimage import color
-from warnings import warn
 import numpy as np
 
 
-class Otsu:
+class Otsu(ImageProcess):
 
     def __init__(self, image: np.ndarray, bins=256):
         """
@@ -30,13 +29,7 @@ class Otsu:
               IEEE Trans. Sys. Man. Cyber. 9 (1): 62–66. doi:10.1109/TSMC.1979.4310076.
 
         """
-        if len(image.shape) > 3 and image.shape[-1] in (3, 4):
-            warn("otsu expects grayscale images; image shape '{}' looks like an RGB image."
-                 " Continuing with gray-scaled version of input image".format(image.shape))
-            self.image = color.rgb2gray(image)
-        else:
-            self.image = image
-        self.bins = bins
+        super().__init__(image=image, bins=bins)
 
     def histogram(self):
         """
