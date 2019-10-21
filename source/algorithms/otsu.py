@@ -30,29 +30,6 @@ class Otsu(ImageProcess):
         """
         super().__init__(image=image, bins=bins)
 
-    def histogram(self):
-        """
-        Method for producing Image histogram with 256 bins
-
-        Returns
-        -------
-        Out         : np.ndarray()
-                      Image histogram with 256 bins
-
-        """
-        # Scratch-Implementation
-        # -------------------------------------------------------
-        # m, n, *_ = self.image.shape
-        # hist = np.zeros(self.bins)
-        # for i in range(0, m):
-        #     for j in range(0, n):
-        #         hist[int(image[i, j])] += 1
-        # return hist
-        #
-        # Numpy-Implementation
-        # -------------------------------------------------------
-        return np.histogram(self.image.ravel(), bins=self.bins)
-
     def otsu_threshold(self):
         """
         Finds the optimal threshold value of given image using Otsu's method
@@ -63,30 +40,7 @@ class Otsu(ImageProcess):
                       optimal threshold based on Otsu's method
 
         """
-        # Scratch-Implementation
-        # -------------------------------------------------------
-        # hist = self.histogram()
-        # total = np.sum(hist)
-        # var, maximum, th = 0, 0, 0
-        # sum_b, w_b = 0, 0
-        # sum_t = np.dot(np.array(range(0, self.bins)), hist)
-        #
-        # for i in range(0, self.bins):
-        #     w_b += hist[i]
-        #     w_f = total - w_b
-        #     if w_b == 0 or w_f == 0:
-        #         continue
-        #     sum_b += i * hist[i]
-        #     sum_f = sum_t - sum_b
-        #     var = w_b * w_f * (sum_b / w_b - sum_f / w_f) ** 2
-        #     if var > maximum:
-        #         maximum = var
-        #         th = i
-        # return th
-
-        # Numpy-Implementation
-        # -------------------------------------------------------
-        hist, center = self.histogram()
+        hist, center = self.histogram(self.image, self.bins)
         hist = hist.astype(float)
         w_b = np.cumsum(hist)
         w_f = np.cumsum(hist[::-1])[::-1]

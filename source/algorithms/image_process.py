@@ -40,6 +40,40 @@ class ImageProcess(ABC):
         self.bins = bins
 
     @staticmethod
+    def histogram(image: np.ndarray = None, bins: int = None):
+        """
+        Method for producing Image histogram with 256 bins
+
+        Parameters
+        ----------
+        see constructor
+
+        Returns
+        -------
+        Out         : np.ndarray()
+                      Image histogram with 256 bins
+
+        """
+        return np.histogram(image, bins)
+
+    @staticmethod
+    def cum_hist(image: np.ndarray = None, bins: (int, list) = None):
+        """
+        Method for producing Image cumulative histogram with 256 bins
+
+        Parameters
+        ----------
+        see constructor
+
+        Returns
+        -------
+        Out         : np.ndarray()
+                      Image cumulative histogram with 256 bins
+
+        """
+        return np.array(np.cumsum(ImageProcess.histogram(image, bins)[0]))
+
+    @staticmethod
     def _compare_images(top_hist, top_pic, bottom_hist, bottom_pic, title, log=False, bins=256,
                         x_line=None):
         """
@@ -67,7 +101,7 @@ class ImageProcess(ABC):
         """
         plt.figure()
         plt.subplot(2, 2, 1)
-        plt.hist(top_hist, bins, color='b')
+        plt.hist(top_hist, list(range(bins)), color='b')
         plt.axvline(x_line, color='r') if x_line else None
         plt.title(title)
         plt.grid()
@@ -78,7 +112,7 @@ class ImageProcess(ABC):
         plt.yticks([])
 
         plt.subplot(2, 2, 3)
-        plt.hist(bottom_hist, bins, color='b', log=log)
+        plt.hist(bottom_hist, list(range(bins)), color='b', log=log)
         plt.axvline(x_line, color='r') if x_line else None
         plt.grid()
 
