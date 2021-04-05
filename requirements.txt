@@ -1,5 +1,5 @@
 cycler==0.10.0
-decorator==4.4.2
+decorator==5.0.5
 imageio==2.9.0
 kiwisolver==1.2.0
 matplotlib==3.3.4
